@@ -2,17 +2,18 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
+User = get_user_model()
+
 
 class AdminSiteTestCase(TestCase):
     """Test users app on admin site"""
 
     def setUp(self):
         """Set up initial data"""
-        self.user_model = get_user_model()
-        self.user = self.user_model.objects.create_user(
+        self.user = User.objects.create_user(
             email="user@example.com", password="qwerty12345", name="John Doe"
         )
-        self.superuser = self.user_model.objects.create_superuser(
+        self.superuser = User.objects.create_superuser(
             email="admin@example.com", password="qwerty12345"
         )
         self.client.force_login(self.superuser)
