@@ -14,6 +14,7 @@ class PublicUserApiTestCase(TestCase):
         self.client = APIClient()
         self.create_user_url = reverse("users:register")
         self.retrieve_token_url = reverse("users:login")
+        self.profile_url = reverse("users:profile")
         self.user_data = {
             "email": "user@example.com",
             "name": "John Doe",
@@ -79,3 +80,40 @@ class PublicUserApiTestCase(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertNotIn("token", resp.data)
+
+    def test_retrieve_profile_user_unauthorized_fail(self):
+        """Test retrieving profile with unauthenticated user fails"""
+        resp = self.client.get(self.profile_url)
+
+        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class PrivateUserApiTestCase(TestCase):
+    """Test private features of user API"""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.profile_url = reverse("users:profile")
+        self.user = User.objects.create_user(
+            email="user@example.com",
+            name="John Doe",
+            password="qwerty12345",
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_retrieve_profile_success(self):
+        """Test retrieving profile for logged-in user is successful"""
+        resp = self.client.get(self.profile_url)
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data, {"email": self.user.email, "name": self.user.name})
+
+    def test_partial_update_profile_success(self):
+        """Test partially updating profile for logged-in user is successful"""
+        data = {"name": "", "password": "asdf6789"}
+        resp = self.client.patch(self.profile_url, data)
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.name, data["name"])
+        self.assertTrue(self.user.check_password(data["password"]))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
