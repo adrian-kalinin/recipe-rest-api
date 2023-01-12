@@ -110,7 +110,7 @@ class PrivateUserApiTestCase(TestCase):
 
     def test_partial_update_profile_success(self):
         """Test partially updating profile for logged-in user is successful"""
-        data = {"name": "", "password": "asdf6789"}
+        data = {"name": "Jane Roe", "password": "asdf6789"}
         resp = self.client.patch(self.profile_url, data)
 
         self.user.refresh_from_db()
