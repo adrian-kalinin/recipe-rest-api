@@ -12,6 +12,16 @@ class UserSerializer(serializers.ModelSerializer):
         """Create and return a new user with encrypted password"""
         return self.Meta.model.objects.create_user(**validated_data)
 
+    def update(self, instance, validated_data):
+        password = validated_data.pop("password")
+        user = super().update(instance, validated_data)
+
+        if password:
+            user.set_password(password)
+            user.save()
+
+        return user
+
     class Meta:
         model = User
         fields = ("email", "name", "password")
