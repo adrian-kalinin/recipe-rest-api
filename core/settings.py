@@ -30,6 +30,7 @@ SHARED_APPS = [
 
 CUSTOM_APPS = [
     "users",
+    "recipes",
 ]
 
 INSTALLED_APPS = CORE_APPS + SHARED_APPS + CUSTOM_APPS
