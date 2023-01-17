@@ -35,7 +35,7 @@ class PrivateRecipeApiTestCase(TestCase):
             password="qwerty12345",
         )
         self.recipe_data = {
-            "user": self.user,
+            "author": self.user,
             "title": "Pasta",
             "cooking_time": 20,
             "description": "Lorem ipsum dolor sit amet",
@@ -50,7 +50,7 @@ class PrivateRecipeApiTestCase(TestCase):
         resp = self.client.get(self.recipe_url)
 
         recipes = models.Recipe.objects.all().order_by("-id")
-        serializer = serializers.Recipe(recipes, many=True)
+        serializer = serializers.RecipeSerializer(recipes, many=True)
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data, serializer.data)
@@ -65,8 +65,8 @@ class PrivateRecipeApiTestCase(TestCase):
 
         resp = self.client.get(self.recipe_url)
 
-        recipes = models.Recipe.objects.filter(user=self.user)
-        serializer = serializers.Recipe(recipes, many=True)
+        recipes = models.Recipe.objects.filter(author=self.user)
+        serializer = serializers.RecipeSerializer(recipes, many=True)
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data, serializer.data)
